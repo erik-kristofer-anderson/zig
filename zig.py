@@ -31,11 +31,11 @@ class Explorer:
         s = "explorer at position {}, {} facing in direction {}.".format(self.x, self.y, self.direction)
         return s
 
-    def step_explorer(self, switches_in_step):
+    def step_explorer(self, switches):
         # self is an explorer
 
         # turn explorer
-        for switch in switches_in_step:
+        for switch in switches:
             if (self.x, self.y) == (switch.x, switch.y):
                 self.turn_explorer(switch)
 
@@ -94,7 +94,7 @@ def parse_artifact(artifact):
 
 
 def move_explorer(explorer_row, switches, artifact):
-    explorer = Explorer(y=explorer_row, x=0, direction="E")
+    explorer = Explorer(x=0, y=explorer_row, direction="E")
     in_room = True
     _, height, width = parse_artifact(artifact)
     while in_room:
@@ -109,6 +109,7 @@ def move_explorer(explorer_row, switches, artifact):
 
 
 def ride_of_fortune(artifact, explorers):
+
     switches, room_height, room_width = parse_artifact(artifact)
 
     exit_locations = []
@@ -116,10 +117,17 @@ def ride_of_fortune(artifact, explorers):
         x, y = move_explorer(explorer_row, switches, artifact)
 
         if x < 0:
-            exit_locations.append(None)
-        else:
-            exit_locations.append([x, y])
-
+            exit_location = None
+        elif x > room_width or y > room_height or y < room_height:
+            if x > room_width:
+                x -= 1
+            elif y > room_height:
+                y -= 1
+            elif y < room_height:
+                y += 1
+            exit_location = [y, x]
+             # exit_location = [x, y]
+        exit_locations.append(exit_location)
         # print([x, y])
     return exit_locations
 
@@ -133,23 +141,4 @@ def ride_of_fortune(artifact, explorers):
 # print(explorer)
 
 
-data = [
-    [
-        '      ',
-        ' A  A ',
-        '      ',
-        '      ',
-        ' A  B ',
-        '      '],
-    [1, 1, 0, 3, 4, 4, 2, 5, 1, 4]]
 
-answer = [None, [5, 4], [0, 5], [3, 5], [0, 4], [5, 1], [2, 5], [5, 5], None, [5, 1]]
-
-artifact_outside = data[0]
-explorers_outside = data[1]
-
-switches_outside, height_outside, width_outside = parse_artifact(artifact_outside)
-# for switch_outside in switches_outside:
-#     print(switch_outside)
-
-print(ride_of_fortune(artifact_outside, explorers_outside))
